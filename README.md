@@ -12,7 +12,7 @@
 pip install cqhttp
 ```
 
-注意可能需要把 `pip` 换成 `pip3`。本 SDK 依赖于 `bottle` 和 `requests` 包，因此他们也会被安装。
+注意可能需要把 `pip` 换成 `pip3`。本 SDK 依赖于 `bottle` 和 `requests` 包，因此它们也会被安装。
 
 也可以 clone 本仓库之后用 `python setup.py install` 来安装。
 
