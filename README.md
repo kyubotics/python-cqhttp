@@ -1,5 +1,8 @@
 # CQHttp Python SDK
 
+[![License](https://img.shields.io/pypi/l/cqhttp.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/cqhttp.svg)](https://pypi.python.org/pypi/cqhttp)
+
 本项目为酷 Q 的 CoolQ HTTP API 插件的 Python SDK，封装了 web server 相关的代码，让使用 Python 的开发者能方便地开发插件。仅支持 Python 3.x。
 
 关于 CoolQ HTTP API 插件，见 [richardchien/coolq-http-api](https://github.com/richardchien/coolq-http-api)。

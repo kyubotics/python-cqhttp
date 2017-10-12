@@ -1,6 +1,6 @@
 from cqhttp import CQHttp
 
-bot = CQHttp(api_root='http://127.0.0.1:5701/')
+bot = CQHttp(api_root='http://127.0.0.1:5700/')
 
 
 @bot.on_message()

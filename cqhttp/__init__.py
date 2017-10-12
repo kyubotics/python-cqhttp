@@ -1,6 +1,8 @@
+from collections import defaultdict
+from functools import wraps
+
 import requests
 
-from functools import wraps
 from bottle import Bottle, request, abort
 
 
@@ -13,19 +15,21 @@ class Error(Exception):
 class _ApiClient(object):
     def __init__(self, api_root=None, token=None):
         self.url = api_root.rstrip('/') if api_root else None
-        self.auth = 'token ' + token if token else None
+        self.token = token
+
+    @property
+    def auth(self):
+        return 'token ' + self.token if self.token else None
 
     def __getattr__(self, item):
-        if not self.url:
-            return None
-        c = _ApiClient(self.url + '/' + item)
-        return c
+        if self.url:
+            c = _ApiClient(api_root=self.url + '/' + item, token=self.token)
+            return c
 
     def __call__(self, *args, **kwargs):
-        resp = requests.post(self.url,
-                             headers={'Authorization': self.auth},
-                             json=kwargs)
-        if resp.status_code == 200:
+        resp = requests.post(self.url, json=kwargs,
+                             headers={'Authorization': self.auth})
+        if resp.ok:
             data = resp.json()
             if data.get('status') == 'ok':
                 return data.get('data')
@@ -55,11 +59,7 @@ def _deco_maker(post_type):
 class CQHttp(_ApiClient):
     def __init__(self, api_root=None, token=None):
         super().__init__(api_root, token)
-        self.handlers = {
-            'message': {},
-            'event': {},
-            'request': {}
-        }
+        self.handlers = defaultdict(dict)
         self.app = Bottle()
         self.app.post('/')(self.handle)
 
@@ -76,11 +76,9 @@ class CQHttp(_ApiClient):
             abort(400)
 
         handler_key = None
-        for pk_pair in (
-                ('message', 'message_type'),
-                ('event', 'event'),
-                ('request', 'request_type'),
-        ):
+        for pk_pair in (('message', 'message_type'),
+                        ('event', 'event'),
+                        ('request', 'request_type')):
             if post_type == pk_pair[0]:
                 handler_key = request.json.get(pk_pair[1])
                 if not handler_key:
@@ -104,8 +102,11 @@ class CQHttp(_ApiClient):
 
     def send(self, context, message, **kwargs):
         if context.get('group_id'):
-            return self.send_group_msg(group_id=context['group_id'], message=message, **kwargs)
+            return self.send_group_msg(group_id=context['group_id'],
+                                       message=message, **kwargs)
         elif context.get('discuss_id'):
-            return self.send_discuss_msg(discuss_id=context['discuss_id'], message=message, **kwargs)
+            return self.send_discuss_msg(discuss_id=context['discuss_id'],
+                                         message=message, **kwargs)
         elif context.get('user_id'):
-            return self.send_private_msg(user_id=context['user_id'], message=message, **kwargs)
+            return self.send_private_msg(user_id=context['user_id'],
+                                         message=message, **kwargs)
