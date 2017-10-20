@@ -1,4 +1,4 @@
-# CQHttp Python SDK
+# CQHTTP Python SDK
 
 [![License](https://img.shields.io/pypi/l/cqhttp.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/cqhttp.svg)](https://pypi.python.org/pypi/cqhttp)
