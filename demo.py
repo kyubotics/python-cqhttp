@@ -22,7 +22,7 @@ def handle_group_increase(context):
                                      user_id=context['user_id'])
     nickname = info['nickname']
     name = nickname if nickname else '新人'
-    bot.send(context, message='欢迎{}～'.format(name), is_raw=True)
+    bot.send(context, message='欢迎{}～'.format(name))
 
 
 @bot.on_request('group')
