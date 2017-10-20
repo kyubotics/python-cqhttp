@@ -1,3 +1,4 @@
+import hmac
 from collections import defaultdict
 from functools import wraps
 
@@ -13,27 +14,30 @@ class Error(Exception):
 
 
 class _ApiClient(object):
-    def __init__(self, api_root=None, token=None):
-        self.url = api_root.rstrip('/') if api_root else None
-        self.token = token
-
-    @property
-    def auth(self):
-        return 'token ' + self.token if self.token else None
+    def __init__(self, api_root=None, access_token=None):
+        self._url = api_root.rstrip('/') if api_root else None
+        self._access_token = access_token
 
     def __getattr__(self, item):
-        if self.url:
-            c = _ApiClient(api_root=self.url + '/' + item, token=self.token)
-            return c
+        if self._url:
+            return _ApiClient(
+                api_root=self._url + '/' + item,
+                access_token=self._access_token
+            )
 
     def __call__(self, *args, **kwargs):
-        resp = requests.post(self.url, json=kwargs,
-                             headers={'Authorization': self.auth})
+        headers = {}
+        if self._access_token:
+            headers['Authorization'] = 'Token ' + self._access_token
+        resp = requests.post(
+            self._url, json=kwargs,
+            headers=headers
+        )
         if resp.ok:
             data = resp.json()
-            if data.get('status') == 'ok':
-                return data.get('data')
-            raise Error(resp.status_code, data.get('retcode'))
+            if data.get('status') == 'failed':
+                raise Error(resp.status_code, data.get('retcode'))
+            return data.get('data')
         raise Error(resp.status_code)
 
 
@@ -46,9 +50,9 @@ def _deco_maker(post_type):
 
             if types:
                 for t in types:
-                    self.handlers[post_type][t] = wrapper
+                    self._handlers[post_type][t] = wrapper
             else:
-                self.handlers[post_type]['*'] = wrapper
+                self._handlers[post_type]['*'] = wrapper
             return wrapper
 
         return decorator
@@ -57,19 +61,29 @@ def _deco_maker(post_type):
 
 
 class CQHttp(_ApiClient):
-    def __init__(self, api_root=None, token=None):
-        super().__init__(api_root, token)
-        self.handlers = defaultdict(dict)
-        self.app = Bottle()
-        self.app.post('/')(self.handle)
+    def __init__(self, api_root=None, access_token=None, secret=None):
+        super().__init__(api_root, access_token)
+        self._secret = secret
+        self._handlers = defaultdict(dict)
+        self._app = Bottle()
+        self._app.post('/')(self._handle)
 
     on_message = _deco_maker('message')
     on_event = _deco_maker('event')
     on_request = _deco_maker('request')
 
-    def handle(self):
-        if self.auth and request.headers.get('Authorization') != self.auth:
-            abort(401)
+    def _handle(self):
+        if self._secret:
+            # check signature
+            if 'X-Signature' not in request.headers:
+                abort(401)
+
+            sec = self._secret
+            if isinstance(sec, str):
+                sec = sec.encode('utf-8')
+            sig = hmac.new(sec, request.body.read(), 'sha1').hexdigest()
+            if request.headers['X-Signature'] != 'sha1=' + sig:
+                abort(403)
 
         post_type = request.json.get('post_type')
         if post_type not in ('message', 'event', 'request'):
@@ -89,16 +103,16 @@ class CQHttp(_ApiClient):
         if not handler_key:
             abort(400)
 
-        handler = self.handlers[post_type].get(handler_key)
+        handler = self._handlers[post_type].get(handler_key)
         if not handler:
-            handler = self.handlers[post_type].get('*')  # try wildcard handler
+            handler = self._handlers[post_type].get('*')  # try wildcard
         if handler:
             assert callable(handler)
             return handler(request.json)
         return ''
 
     def run(self, host=None, port=None, **kwargs):
-        self.app.run(host=host, port=port, **kwargs)
+        self._app.run(host=host, port=port, **kwargs)
 
     def send(self, context, message, **kwargs):
         if context.get('group_id'):
