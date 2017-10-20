@@ -66,7 +66,7 @@ bot.run(host='127.0.0.1', port=8080)
 
 为了简化发送消息的操作，提供了 `send(context, message)` 函数，这里的第一个参数 `context` 也就是上报数据，传入之后函数会自己判断当前需要发送到哪里（哪个好友，或哪个群），无需手动再指定，其它参数仍然可以从 keyword argument 指定，例如 `auto_escape=True`。
 
-每个 API 调用最后都会由 `requests` 库来发出请求，如果网络无法连接，它可能会抛出 `ConnectionError` 等异常，见 [错误与异常](http://cn.python-requests.org/zh_CN/latest/user/quickstart.html#id11)。而一旦请求成功，本 SDK 会判断 HTTP 响应状态码，只有当状态码为 200，且 `status` 字段为 `ok` 时，会返回 `data` 字段的内容，否则抛出 `cqhttp.Error` 异常，在这个异常中你可以通过 `status_code` 和 `retcode` 属性来获取 HTTP 状态码和插件的 `retcode`（如果状态码不为 200，则 `retcode` 为 None），具体响应状态码和 `retcode` 的含义，见 [响应说明](https://richardchien.github.io/coolq-http-api/#/API?id=%E5%93%8D%E5%BA%94%E8%AF%B4%E6%98%8E)。
+每个 API 调用最后都会由 `requests` 库来发出请求，如果网络无法连接，它可能会抛出 `ConnectionError` 等异常，见 [错误与异常](http://cn.python-requests.org/zh_CN/latest/user/quickstart.html#id11)。而一旦请求成功，本 SDK 会判断 HTTP 响应状态码，只有当状态码为 200，且 `status` 字段为 `ok` 或 `async` 时，会返回 `data` 字段的内容，否则抛出 `cqhttp.Error` 异常，在这个异常中你可以通过 `status_code` 和 `retcode` 属性来获取 HTTP 状态码和插件的 `retcode`（如果状态码不为 200，则 `retcode` 为 None），具体响应状态码和 `retcode` 的含义，见 [响应说明](https://richardchien.github.io/coolq-http-api/#/API?id=%E5%93%8D%E5%BA%94%E8%AF%B4%E6%98%8E)。
 
 ### 运行实例
 
