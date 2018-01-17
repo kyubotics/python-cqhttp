@@ -62,7 +62,7 @@ bot.run(host='127.0.0.1', port=8080)
 
 ### API 调用
 
-在设置了 `api_root` 的情况下，直接在 `CQHttp` 类的实例上就可以调用 API，例如 `bot.send_private_msg(user_id=123456, message='hello')`，这里的 `send_private_msg` 即为 [`/send_private_msg` 发送私聊消息](https://richardchien.github.io/coolq-http-api/#/API?id=send_private_msg-%E5%8F%91%E9%80%81%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF) 中的 `/send_private_msg`，API 所需参数直接通过 keyword argument 传入。其它 API 见 [API 描述](https://richardchien.github.io/coolq-http-api/#/API)。
+在设置了 `api_root` 的情况下，直接在 `CQHttp` 类的实例上就可以调用 API，例如 `bot.send_private_msg(user_id=123456, message='hello')`，这里的 `send_private_msg` 即为 [`/send_private_msg` 发送私聊消息](https://richardchien.github.io/coolq-http-api/#/API?id=send_private_msg-%E5%8F%91%E9%80%81%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF) 中的 `/send_private_msg`，**API 所需参数直接通过命名参数（keyword argument）传入**。其它 API 见 [API 描述](https://richardchien.github.io/coolq-http-api/#/API)。
 
 为了简化发送消息的操作，提供了 `send(context, message)` 函数，这里的第一个参数 `context` 也就是上报数据，传入之后函数会自己判断当前需要发送到哪里（哪个好友，或哪个群），无需手动再指定，其它参数仍然可以从 keyword argument 指定，例如 `auto_escape=True`。
 
@@ -70,7 +70,7 @@ bot.run(host='127.0.0.1', port=8080)
 
 ### 运行实例
 
-使用装饰器定义好处理函数之后，调用 `bot.run()` 即可运行。你需要传入 `host` 和 `port` 参数，来指定服务端需要运行在哪个地址，然后在 HTTP API 插件的配置文件中，在 `post_url` 项中配置此地址（`http://host:port/`）。
+使用装饰器定义好处理函数之后，调用 `bot.run()` 即可运行。你需要传入 `host` 和 `port` 参数，来指定服务端需要运行在哪个地址，**然后在 HTTP API 插件的配置文件中，在 `post_url` 项中配置此地址（`http://host:port/`）**。
 
 ## 遇到问题
 
