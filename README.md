@@ -72,6 +72,12 @@ bot.run(host='127.0.0.1', port=8080)
 
 使用装饰器定义好处理函数之后，调用 `bot.run()` 即可运行。你需要传入 `host` 和 `port` 参数，来指定服务端需要运行在哪个地址，**然后在 HTTP API 插件的配置文件中，在 `post_url` 项中配置此地址（`http://host:port/`）**。
 
+### CQHttp Helper
+
+项目根目录下的 [`cqhttp_helper.py`](cqhttp_helper.py) 文件是 [SuperMarioSF](https://github.com/SuperMarioSF) 贡献的帮助类，在 `CQHttp` 类的基础上提供了每个 API 调用的具体函数，以便在支持的代码编辑器中使用代码补全和文档速览。
+
+注意，此文件不在 pip 安装的包中，需单独下载，如果以后插件新增接口，此文件可能没有及时更新，但不影响使用，你仍然可以像使用原始的 `CQHttp` 一样使用它。
+
 ## 遇到问题
 
 本 SDK 的代码非常简单，如果发现有问题可以参考下源码，可以自行做一些修复，也欢迎提交 pull request 或 issue。
