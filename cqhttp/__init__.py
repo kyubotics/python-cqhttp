@@ -3,8 +3,7 @@ from collections import defaultdict
 from functools import wraps
 
 import requests
-
-from bottle import Bottle, request, abort
+from flask import Flask, request, abort, jsonify
 
 
 class Error(Exception):
@@ -65,11 +64,11 @@ class CQHttp(_ApiClient):
         super().__init__(api_root, access_token)
         self._secret = secret
         self._handlers = defaultdict(dict)
-        self._app = Bottle()
-        self._app.post('/')(self._handle)
+        self._app = Flask(__name__)
+        self._app.route('/', methods=['POST'])(self._handle)
 
     on_message = _deco_maker('message')
-    on_event = _deco_maker('event')
+    on_notice = _deco_maker('notice')
     on_request = _deco_maker('request')
 
     def _handle(self):
@@ -81,20 +80,22 @@ class CQHttp(_ApiClient):
             sec = self._secret
             if isinstance(sec, str):
                 sec = sec.encode('utf-8')
-            sig = hmac.new(sec, request.body.read(), 'sha1').hexdigest()
+            sig = hmac.new(sec, request.get_data(), 'sha1').hexdigest()
             if request.headers['X-Signature'] != 'sha1=' + sig:
                 abort(403)
 
-        post_type = request.json.get('post_type')
-        if post_type not in ('message', 'event', 'request'):
+        payload = request.json
+
+        post_type = payload.get('post_type')
+        if post_type not in ('message', 'notice', 'request'):
             abort(400)
 
         handler_key = None
         for pk_pair in (('message', 'message_type'),
-                        ('event', 'event'),
+                        ('notice', 'notice_type'),
                         ('request', 'request_type')):
             if post_type == pk_pair[0]:
-                handler_key = request.json.get(pk_pair[1])
+                handler_key = payload.get(pk_pair[1])
                 if not handler_key:
                     abort(400)
                 else:
@@ -108,7 +109,8 @@ class CQHttp(_ApiClient):
             handler = self._handlers[post_type].get('*')  # try wildcard
         if handler:
             assert callable(handler)
-            return handler(request.json)
+            response = handler(payload)
+            return jsonify(response) if isinstance(response, dict) else ''
         return ''
 
     def run(self, host=None, port=None, **kwargs):

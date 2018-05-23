@@ -1,12 +1,18 @@
+
 # IntelliJ project files
 .idea
 *.iml
 
+# VS Code project files
+.vscode
+
 # Python cache
-*.pyc
 __pycache__
 
 # Build files
 build
 dist
 *.egg-info
+
+venv
+dev.py
