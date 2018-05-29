@@ -15,11 +15,13 @@
 pip install cqhttp
 ```
 
-注意可能需要把 `pip` 换成 `pip3`。本 SDK 依赖于 `bottle` 和 `requests` 包，因此它们也会被安装。
+注意可能需要把 `pip` 换成 `pip3`。本 SDK 依赖于 `Flask` 和 `requests` 包，因此它们也会被安装。
 
 也可以 clone 本仓库之后用 `python setup.py install` 来安装。
 
-> 目前 SDK 最新版（1.1.0+）已支持插件版本 3.0，且不再兼容旧版插件，如果你需要使用旧版插件，请安装 1.0.1 版本 `pip install cqhttp==1.0.1`。
+> SDK 的 1.1.0 及以上版本支持插件版本 3.x，且不再兼容旧版插件，如果你需要使用旧版插件，请安装 1.0.1 版本 `pip install cqhttp==1.0.1`。
+>
+> 1.2.0 及以上版本支持插件版本 4.x，同时兼容 3.x。
 
 然后新建 Python 文件，运行 CQHttp 后端：
 
@@ -37,7 +39,7 @@ def handle_msg(context):
     return {'reply': context['message'], 'at_sender': False}
 
 
-@bot.on_event('group_increase')
+@bot.on_notice('group_increase')  # 如果插件版本是 3.x，这里需要使用 @bot.on_event
 def handle_group_increase(context):
     bot.send(context, message='欢迎新人～', is_raw=True)  # 发送欢迎新人
 
