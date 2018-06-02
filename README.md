@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/pypi/l/cqhttp.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/cqhttp.svg)](https://pypi.python.org/pypi/cqhttp)
 
-本项目为酷 Q 的 CoolQ HTTP API 插件的 Python SDK，封装了 web server 相关的代码，让使用 Python 的开发者能方便地开发插件。仅支持 Python 3.x。
+本项目为酷 Q 的 CoolQ HTTP API 插件的 Python SDK，封装了 web server 相关的代码，让使用 Python 的开发者能方便地开发插件。仅支持 Python 3.5+。
 
 关于 CoolQ HTTP API 插件，见 [richardchien/coolq-http-api](https://github.com/richardchien/coolq-http-api)。
 
@@ -79,6 +79,10 @@ bot.run(host='127.0.0.1', port=8080)
 项目根目录下的 [`cqhttp_helper.py`](cqhttp_helper.py) 文件是 [SuperMarioSF](https://github.com/SuperMarioSF) 贡献的帮助类，在 `CQHttp` 类的基础上提供了每个 API 调用的具体函数，以便在支持的代码编辑器中使用代码补全和文档速览。
 
 注意，此文件不在 pip 安装的包中，需单独下载，如果以后插件新增接口，此文件可能没有及时更新，但不影响使用，你仍然可以像使用原始的 `CQHttp` 一样使用它。
+
+### 部署
+
+`bot.run()` 只适用于开发环境，不建议用于生产环境，因此 SDK 从 1.2.1 版本开始提供 `bot.wsgi` 属性以获取其内部兼容 WSGI 的 app 对象，从而可以使用 Gunicorn、uWSGI 等软件来部署。
 
 ## 遇到问题
 

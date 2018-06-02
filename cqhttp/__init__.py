@@ -53,8 +53,12 @@ class CQHttp:
         self._access_token = access_token
         self._secret = secret
         self._handlers = defaultdict(dict)
-        self._flask_app = Flask(__name__)
-        self._flask_app.route('/', methods=['POST'])(self._handle)
+        self._server_app = Flask(__name__)
+        self._server_app.route('/', methods=['POST'])(self._handle)
+
+    @property
+    def wsgi(self):
+        return self._server_app
 
     on_message = _deco_maker('message')
     on_notice = _deco_maker('notice')
@@ -90,7 +94,7 @@ class CQHttp:
         return ''
 
     def run(self, host=None, port=None, **kwargs):
-        self._flask_app.run(host=host, port=port, **kwargs)
+        self._server_app.run(host=host, port=port, **kwargs)
 
     def send(self, context, message, **kwargs):
         context = context.copy()
