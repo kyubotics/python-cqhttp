@@ -60,15 +60,15 @@ bot.run(host='127.0.0.1', port=8080)
 
 `on_message`、`on_notice`（插件 v3.x 对应为 `on_event`）、`on_request` 三个装饰器分别对应三个上报类型（`post_type`），括号中指出要处理的消息类型（`message_type`）、通知类型（`notice_type`）（插件 v3.x 对应 `event` 事件名）、请求类型（`request_type`），一次可指定多个，如果留空，则会处理所有这个上报类型的上报。在上面的例子中 `handle_msg` 函数将会在收到任意渠道的消息时被调用，`handle_group_increase` 函数会在群成员增加时调用。
 
-上面三个装饰器装饰的函数，统一接受一个参数，即为上报的数据，具体数据内容见 [事件上报](https://richardchien.github.io/coolq-http-api/#/Post)；返回值可以是一个字典，会被自动作为 JSON 响应返回给 HTTP API 插件，具体见 [上报请求的响应数据格式](https://richardchien.github.io/coolq-http-api/#/Post?id=%E4%B8%8A%E6%8A%A5%E8%AF%B7%E6%B1%82%E7%9A%84%E5%93%8D%E5%BA%94%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F)。
+上面三个装饰器装饰的函数，统一接受一个参数，即为上报的数据，具体数据内容见 [事件上报](https://cqhttp.cc/docs/#/Post)；返回值可以是一个字典，会被自动作为 JSON 响应返回给 HTTP API 插件，具体见 [上报请求的响应数据格式](https://cqhttp.cc/docs/#/Post?id=%E4%B8%8A%E6%8A%A5%E8%AF%B7%E6%B1%82%E7%9A%84%E5%93%8D%E5%BA%94%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F)。
 
 ### API 调用
 
-在设置了 `api_root` 的情况下，直接在 `CQHttp` 类的实例上就可以调用 API，例如 `bot.send_private_msg(user_id=123456, message='hello')`，这里的 `send_private_msg` 即为 [`/send_private_msg` 发送私聊消息](https://richardchien.github.io/coolq-http-api/#/API?id=send_private_msg-%E5%8F%91%E9%80%81%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF) 中的 `/send_private_msg`，**API 所需参数直接通过命名参数（keyword argument）传入**。其它 API 见 [API 描述](https://richardchien.github.io/coolq-http-api/#/API)。
+在设置了 `api_root` 的情况下，直接在 `CQHttp` 类的实例上就可以调用 API，例如 `bot.send_private_msg(user_id=123456, message='hello')`，这里的 `send_private_msg` 即为 [`/send_private_msg` 发送私聊消息](https://cqhttp.cc/docs/#/API?id=send_private_msg-%E5%8F%91%E9%80%81%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF) 中的 `/send_private_msg`，**API 所需参数直接通过命名参数（keyword argument）传入**。其它 API 见 [API 列表](https://cqhttp.cc/docs/#/API?id=api-%E5%88%97%E8%A1%A8)。
 
 为了简化发送消息的操作，提供了 `send(context, message)` 函数，这里的第一个参数 `context` 也就是上报数据，传入之后函数会自己判断当前需要发送到哪里（哪个好友，或哪个群），无需手动再指定，其它参数仍然可以从 keyword argument 指定，例如 `auto_escape=True`。
 
-每个 API 调用最后都会由 `requests` 库来发出请求，如果网络无法连接，它可能会抛出 `ConnectionError` 等异常，见 [错误与异常](http://cn.python-requests.org/zh_CN/latest/user/quickstart.html#id11)。而一旦请求成功，本 SDK 会判断 HTTP 响应状态码，只有当状态码为 200，且 `status` 字段为 `ok` 或 `async` 时，会返回 `data` 字段的内容，否则抛出 `cqhttp.Error` 异常，在这个异常中你可以通过 `status_code` 和 `retcode` 属性来获取 HTTP 状态码和插件的 `retcode`（如果状态码不为 200，则 `retcode` 为 None），具体响应状态码和 `retcode` 的含义，见 [响应说明](https://richardchien.github.io/coolq-http-api/#/API?id=%E5%93%8D%E5%BA%94%E8%AF%B4%E6%98%8E)。
+每个 API 调用最后都会由 `requests` 库来发出请求，如果网络无法连接，它可能会抛出 `ConnectionError` 等异常，见 [错误与异常](http://cn.python-requests.org/zh_CN/latest/user/quickstart.html#id11)。而一旦请求成功，本 SDK 会判断 HTTP 响应状态码，只有当状态码为 200，且 `status` 字段为 `ok` 或 `async` 时，会返回 `data` 字段的内容，否则抛出 `cqhttp.Error` 异常，在这个异常中你可以通过 `status_code` 和 `retcode` 属性来获取 HTTP 状态码和插件的 `retcode`（如果状态码不为 200，则 `retcode` 为 None），具体响应状态码和 `retcode` 的含义，见 [响应说明](https://cqhttp.cc/docs/#/API?id=%E5%93%8D%E5%BA%94%E8%AF%B4%E6%98%8E)。
 
 ### 运行实例
 
