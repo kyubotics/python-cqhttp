@@ -41,7 +41,7 @@ def handle_msg(context):
 
 @bot.on_notice('group_increase')  # 如果插件版本是 3.x，这里需要使用 @bot.on_event
 def handle_group_increase(context):
-    bot.send(context, message='欢迎新人～', is_raw=True)  # 发送欢迎新人
+    bot.send(context, message='欢迎新人～', auto_escape=True)  # 发送欢迎新人
 
 
 @bot.on_request('group', 'friend')
