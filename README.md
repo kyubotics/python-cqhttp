@@ -98,6 +98,10 @@ async def admin():
 
 目前 `bot.server_app` 和 `bot.wsgi` 等价。
 
+## 更新日志
+
+更新日志见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 遇到问题
 
 本 SDK 的代码非常简单，如果发现有问题可以参考下源码，可以自行做一些修复，也欢迎提交 pull request 或 issue。
