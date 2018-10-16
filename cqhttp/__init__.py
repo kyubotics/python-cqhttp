@@ -60,10 +60,15 @@ class CQHttp:
     def wsgi(self):
         return self._server_app
 
+    @property
+    def server_app(self):
+        return self._server_app
+
     on_message = _deco_maker('message')
     on_notice = _deco_maker('notice')
     on_event = _deco_maker('event')  # compatible with v3.x
     on_request = _deco_maker('request')
+    on_meta_event = _deco_maker('meta_event')
 
     def _handle(self):
         if self._secret:
@@ -79,10 +84,13 @@ class CQHttp:
         payload = request.json
         post_type = payload.get('post_type')
 
-        type_key = payload.get({'message': 'message_type',
-                                'notice': 'notice_type',
-                                'event': 'event',  # compatible with v3.x
-                                'request': 'request_type'}.get(post_type))
+        type_key = payload.get(
+            {'message': 'message_type',
+             'notice': 'notice_type',
+             'event': 'event',  # compatible with v3.x
+             'request': 'request_type',
+             'meta_event': 'meta_event_type'}.get(post_type)
+        )
         if not type_key:
             abort(400)
 

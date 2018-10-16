@@ -1,6 +1,6 @@
 # CQHttp Python SDK
 
-[![License](https://img.shields.io/pypi/l/cqhttp.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/richardchien/python-cqhttp.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/cqhttp.svg)](https://pypi.python.org/pypi/cqhttp)
 
 本项目为酷 Q 的 CoolQ HTTP API 插件的 Python SDK，封装了 web server 相关的代码，让使用 Python 的开发者能方便地开发插件。仅支持 Python 3.5+。
@@ -58,9 +58,9 @@ bot.run(host='127.0.0.1', port=8080)
 
 ### 事件处理
 
-`on_message`、`on_notice`（插件 v3.x 对应为 `on_event`）、`on_request` 三个装饰器分别对应三个上报类型（`post_type`），括号中指出要处理的消息类型（`message_type`）、通知类型（`notice_type`）（插件 v3.x 对应 `event` 事件名）、请求类型（`request_type`），一次可指定多个，如果留空，则会处理所有这个上报类型的上报。在上面的例子中 `handle_msg` 函数将会在收到任意渠道的消息时被调用，`handle_group_increase` 函数会在群成员增加时调用。
+`on_message`、`on_notice`（插件 v3.x 对应为 `on_event`）、`on_request`、`on_meta_event` 装饰器分别对应插件的四个上报类型（`post_type`），括号中指出要处理的消息类型（`message_type`）、通知类型（`notice_type`）（插件 v3.x 对应 `event` 事件名）、请求类型（`request_type`）、元事件类型（`meta_event_type`），一次可指定多个，如果留空，则会处理所有这个上报类型的上报。在上面的例子中 `handle_msg` 函数将会在收到任意渠道的消息时被调用，`handle_group_increase` 函数会在群成员增加时调用。
 
-上面三个装饰器装饰的函数，统一接受一个参数，即为上报的数据，具体数据内容见 [事件上报](https://cqhttp.cc/docs/#/Post)；返回值可以是一个字典，会被自动作为 JSON 响应返回给 HTTP API 插件，具体见 [上报请求的响应数据格式](https://cqhttp.cc/docs/#/Post?id=%E4%B8%8A%E6%8A%A5%E8%AF%B7%E6%B1%82%E7%9A%84%E5%93%8D%E5%BA%94%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F)。
+上面装饰器装饰的函数，统一接受一个参数，即为上报的数据，具体数据内容见 [事件上报](https://cqhttp.cc/docs/#/Post)；返回值可以是一个字典，会被自动作为 JSON 响应返回给 HTTP API 插件，具体见 [上报请求的响应数据格式](https://cqhttp.cc/docs/#/Post?id=%E4%B8%8A%E6%8A%A5%E8%AF%B7%E6%B1%82%E7%9A%84%E5%93%8D%E5%BA%94%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F)。
 
 ### API 调用
 
@@ -83,6 +83,20 @@ bot.run(host='127.0.0.1', port=8080)
 ### 部署
 
 `bot.run()` 只适用于开发环境，不建议用于生产环境，因此 SDK 从 1.2.1 版本开始提供 `bot.wsgi` 属性以获取其内部兼容 WSGI 的 app 对象，从而可以使用 Gunicorn、uWSGI 等软件来部署。
+
+### 添加路由
+
+`CQHttp` 内部使用 [Flask](http://flask.pocoo.org/) 来提供 web server，默认添加了 bot 所需的 `/` 路由，如需添加其它路由，例如在 `/admin/` 提供管理面板访问，可以通过 `bot.server_app` 访问内部的 `Flask` 实例来做到：
+
+```python
+app = bot.server_app
+
+@app.route('/admin')
+async def admin():
+    return 'This is the admin page.'
+```
+
+目前 `bot.server_app` 和 `bot.wsgi` 等价。
 
 ## 遇到问题
 
