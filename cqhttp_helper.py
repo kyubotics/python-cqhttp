@@ -933,4 +933,24 @@ class CQHttp(_cqhttp.CQHttp):
         return super().__getattr__('_get_friend_list') \
             ()
 
+    def send(self, context, message, **kwargs):
+        """
+        便捷回复。会根据传入的context自动判断回复对象
+        ------------
+        :param dict context: 事件收到的content
+        :return: None
+        :rtype: None
+        ------------
+        """
+        context = context.copy()
+        context['message'] = message
+        context.update(kwargs)
+        if 'message_type' not in context:
+            if 'group_id' in context:
+                context['message_type'] = 'group'
+            elif 'discuss_id' in context:
+                context['message_type'] = 'discuss'
+            elif 'user_id' in context:
+                context['message_type'] = 'private'
+        return super().__getattr__('send_msg')(**context)
 
