@@ -2,6 +2,8 @@
 
 [![License](https://img.shields.io/github/license/richardchien/python-cqhttp.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/cqhttp.svg)](https://pypi.python.org/pypi/cqhttp)
+[![QQ 版本发布群](https://img.shields.io/badge/%E7%89%88%E6%9C%AC%E5%8F%91%E5%B8%83%E7%BE%A4-218529254-green.svg)](https://jq.qq.com/?_wv=1027&k=5Nl0zhE)
+[![Telegram 版本发布频道](https://img.shields.io/badge/%E7%89%88%E6%9C%AC%E5%8F%91%E5%B8%83%E9%A2%91%E9%81%93-join-green.svg)](https://t.me/cqhttp_release)
 
 本项目为酷 Q 的 CoolQ HTTP API 插件的 Python SDK，封装了 web server 相关的代码，让使用 Python 的开发者能方便地开发插件。仅支持 Python 3.5+。
 
