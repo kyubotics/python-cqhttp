@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setup(
     name='cqhttp',
-    version='1.3.0',
+    version='1.3.1',
     packages=['cqhttp'],
     url='https://github.com/cqmoe/python-cqhttp',
     license='MIT License',
