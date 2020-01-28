@@ -1,6 +1,7 @@
 import hmac
 from collections import defaultdict
 from functools import wraps
+from typing import Callable
 
 import requests
 from flask import Flask, request, abort, jsonify
@@ -28,23 +29,25 @@ def _api_client(url, access_token=None):
     return do_call
 
 
-def _deco_maker(post_type):
-    def deco_decorator(self, *types):
-        def decorator(func):
+def _deco_maker(type_):
+    def deco_deco(self, arg, *detail_types):
+        def deco(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
                 return func(*args, **kwargs)
 
-            if types:
-                for t in types:
-                    self._handlers[post_type][t] = wrapper
+            if detail_types:
+                for detail_type in detail_types:
+                    self._handlers[type_][detail_type] = wrapper
             else:
-                self._handlers[post_type]['*'] = wrapper
+                self._handlers[type_]['*'] = wrapper
             return wrapper
 
-        return decorator
+        if isinstance(arg, Callable):
+            return deco(arg)
+        return deco
 
-    return deco_decorator
+    return deco_deco
 
 
 class CQHttp:

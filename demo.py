@@ -5,7 +5,7 @@ bot = CQHttp(api_root='http://127.0.0.1:5700/',
              secret='abc')
 
 
-@bot.on_message()
+@bot.on_message
 def handle_msg(event):
     try:
         # 下面这句等价于 bot.send_private_msg(user_id=event['user_id'],
@@ -27,10 +27,9 @@ def handle_group_increase(event):
     bot.send(event, message='欢迎{}～'.format(name))
 
 
-@bot.on_request('group')
+@bot.on_request('group', 'friend')
 def handle_group_request(event):
     if event['comment'] != 'some-secret':
-        # 如果插件版本是 3.x，这里需要使用 event.message
         # 验证信息不符，拒绝
         return {'approve': False, 'reason': '你填写的验证信息有误'}
     return {'approve': True}
