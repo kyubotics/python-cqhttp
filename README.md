@@ -1,15 +1,17 @@
-# CQHttp Python SDK
+# CQHTTP Python SDK
 
 [![License](https://img.shields.io/github/license/richardchien/python-cqhttp.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/cqhttp.svg)](https://pypi.python.org/pypi/cqhttp)
-[![QQ 群](https://img.shields.io/badge/qq%E7%BE%A4-768887710-orange.svg)](https://jq.qq.com/?_wv=1027&k=5OFifDh)
+![Python Version](https://img.shields.io/badge/python-3.5+-blue.svg)
+![CQHTTP Version](https://img.shields.io/badge/cqhttp-4.8+-black.svg)
+[![QQ 群](https://img.shields.io/badge/qq群-768887710-orange.svg)](https://jq.qq.com/?_wv=1027&k=5OFifDh)
 [![Telegram](https://img.shields.io/badge/telegram-chat-blue.svg)](https://t.me/cqhttp)
-[![QQ 版本发布群](https://img.shields.io/badge/%E7%89%88%E6%9C%AC%E5%8F%91%E5%B8%83%E7%BE%A4-218529254-green.svg)](https://jq.qq.com/?_wv=1027&k=5Nl0zhE)
-[![Telegram 版本发布频道](https://img.shields.io/badge/%E7%89%88%E6%9C%AC%E5%8F%91%E5%B8%83%E9%A2%91%E9%81%93-join-green.svg)](https://t.me/cqhttp_release)
+[![QQ 版本发布群](https://img.shields.io/badge/版本发布群-218529254-green.svg)](https://jq.qq.com/?_wv=1027&k=5Nl0zhE)
+[![Telegram 版本发布频道](https://img.shields.io/badge/版本发布频道-join-green.svg)](https://t.me/cqhttp_release)
 
-本项目为酷 Q 的 CoolQ HTTP API 插件的 Python SDK，封装了 web server 相关的代码，让使用 Python 的开发者能方便地开发插件。仅支持 Python 3.5+。
+本项目为 CQHTTP 插件的 Python SDK，封装了 web server 相关的代码，让使用 Python 的开发者能方便地开发插件。
 
-关于 CoolQ HTTP API 插件，见 [richardchien/coolq-http-api](https://github.com/richardchien/coolq-http-api)。
+关于 CQHTTP 插件，见 [richardchien/coolq-http-api](https://github.com/richardchien/coolq-http-api)。
 
 ## 用法
 
@@ -21,13 +23,9 @@ pip install cqhttp
 
 注意可能需要把 `pip` 换成 `pip3`。本 SDK 依赖于 `Flask` 和 `requests` 包，因此它们也会被安装。
 
-也可以 clone 本仓库之后用 `python setup.py install` 来安装。
+也可以克隆本仓库之后用 `python setup.py install` 来安装。
 
-> SDK 的 1.1.0 及以上版本支持插件版本 3.x，且不再兼容旧版插件，如果你需要使用旧版插件，请安装 1.0.1 版本 `pip install cqhttp==1.0.1`。
->
-> 1.2.0 及以上版本支持插件版本 4.x，同时兼容 3.x。
-
-然后新建 Python 文件，运行 CQHttp 后端：
+然后新建 Python 文件，运行 bot：
 
 ```py
 from cqhttp import CQHttp
@@ -37,34 +35,34 @@ bot = CQHttp(api_root='http://127.0.0.1:5700/',
              secret='your-secret')
 
 
-@bot.on_message()
-def handle_msg(context):
-    bot.send(context, '你好呀，下面一条是你刚刚发的：')
-    return {'reply': context['message'], 'at_sender': False}
+@bot.on_message
+def handle_msg(event):
+    bot.send(event, '你好呀，下面一条是你刚刚发的：')
+    return {'reply': event['message'], 'at_sender': False}
 
 
 @bot.on_notice('group_increase')  # 如果插件版本是 3.x，这里需要使用 @bot.on_event
-def handle_group_increase(context):
-    bot.send(context, message='欢迎新人～', auto_escape=True)  # 发送欢迎新人
+def handle_group_increase(event):
+    bot.send(event, message='欢迎新人～', auto_escape=True)  # 发送欢迎新人
 
 
 @bot.on_request('group', 'friend')
-def handle_request(context):
+def handle_request(event):
     return {'approve': True}  # 同意所有加群、加好友请求
 
 
-bot.run(host='127.0.0.1', port=8080)
+bot.run(host='127.0.0.1', port=8080, debug=True)
 ```
 
 ### 创建实例
 
-首先创建 `CQHttp` 类的实例，传入 `api_root`，即为酷 Q HTTP API 插件的监听地址，如果你不需要调用 API，也可以不传入。Access token 和签名密钥也在这里传入，如果没有配置 `access_token` 或 `secret` 项，则不传。
+首先创建 `CQHttp` 类的实例，传入 `api_root`，即为 CQHTTP 插件的监听地址，例如 `http://127.0.0.1:5700`，如果你不需要调用 API，也可以不传入。Access token 和签名密钥也在这里传入，如果没有配置 `access_token` 或 `secret` 项，则不传。
 
 ### 事件处理
 
-`on_message`、`on_notice`（插件 v3.x 对应为 `on_event`）、`on_request`、`on_meta_event` 装饰器分别对应插件的四个上报类型（`post_type`），括号中指出要处理的消息类型（`message_type`）、通知类型（`notice_type`）（插件 v3.x 对应 `event` 事件名）、请求类型（`request_type`）、元事件类型（`meta_event_type`），一次可指定多个，如果留空，则会处理所有这个上报类型的上报。在上面的例子中 `handle_msg` 函数将会在收到任意渠道的消息时被调用，`handle_group_increase` 函数会在群成员增加时调用。
+`on_message`、`on_notice`、`on_request`、`on_meta_event` 装饰器分别对应插件的四个上报类型（`post_type`），括号中指出要处理的消息类型（`message_type`）、通知类型（`notice_type`）、请求类型（`request_type`）、元事件类型（`meta_event_type`），一次可指定多个，如果留空，则会处理所有这个上报类型的上报。在上面的例子中 `handle_msg` 函数将会在收到任意渠道的消息时被调用，`handle_group_increase` 函数会在群成员增加时调用。
 
-上面装饰器装饰的函数，统一接受一个参数，即为上报的数据，具体数据内容见 [事件上报](https://cqhttp.cc/docs/#/Post)；返回值可以是一个字典，会被自动作为 JSON 响应返回给 HTTP API 插件，具体见 [上报请求的响应数据格式](https://cqhttp.cc/docs/#/Post?id=%E4%B8%8A%E6%8A%A5%E8%AF%B7%E6%B1%82%E7%9A%84%E5%93%8D%E5%BA%94%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F)。
+上面装饰器装饰的函数，统一接受一个参数，即为上报的数据，具体数据内容见 [事件上报](https://cqhttp.cc/docs/#/Post)；返回值可以是一个字典，会被自动作为 JSON 响应返回给 CQHTTP 插件，具体见 [上报请求的响应数据格式](https://cqhttp.cc/docs/#/Post?id=%E4%B8%8A%E6%8A%A5%E8%AF%B7%E6%B1%82%E7%9A%84%E5%93%8D%E5%BA%94%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F)。
 
 ### API 调用
 
@@ -76,7 +74,7 @@ bot.run(host='127.0.0.1', port=8080)
 
 ### 运行实例
 
-使用装饰器定义好处理函数之后，调用 `bot.run()` 即可运行。你需要传入 `host` 和 `port` 参数，来指定服务端需要运行在哪个地址，**然后在 HTTP API 插件的配置文件中，在 `post_url` 项中配置此地址（`http://host:port/`）**。
+使用装饰器定义好处理函数之后，调用 `bot.run()` 即可运行。你需要传入 `host` 和 `port` 参数，来指定服务端需要运行在哪个地址，**然后在 CQHTTP 插件的配置文件中，在 `post_url` 项填写此地址（`http://host:port/`）**。
 
 ### CQHttp Helper
 
