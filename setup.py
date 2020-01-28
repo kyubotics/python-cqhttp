@@ -5,13 +5,13 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setup(
     name='cqhttp',
-    version='1.2.3',
+    version='1.3.0',
     packages=['cqhttp'],
-    url='https://github.com/richardchien/python-cqhttp',
+    url='https://github.com/cqmoe/python-cqhttp',
     license='MIT License',
     author='Richard Chien',
     author_email='richardchienthebest@gmail.com',
-    description='CQHttp Python SDK',
+    description='A Python SDK for CQHTTP.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=['Flask', 'requests'],
