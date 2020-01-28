@@ -30,14 +30,14 @@ def _api_client(url, access_token=None):
 
 
 def _deco_maker(type_):
-    def deco_deco(self, arg, *detail_types):
+    def deco_deco(self, arg=None, *detail_types):
         def deco(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
                 return func(*args, **kwargs)
 
-            if detail_types:
-                for detail_type in detail_types:
+            if isinstance(arg, str):
+                for detail_type in [arg] + list(detail_types):
                     self._handlers[type_][detail_type] = wrapper
             else:
                 self._handlers[type_]['*'] = wrapper
