@@ -1,5 +1,9 @@
 # 更新日志
 
+## v1.3.1
+
+- 修复 1.3.0 中 `on_*` 装饰器的严重 bug
+
 ## v1.3.0
 
 - `CQHttp` 类新增 `logger` 属性，可获取 Flask app 的 logger
