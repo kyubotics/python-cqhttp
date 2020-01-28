@@ -64,9 +64,12 @@ class CQHttp:
     def server_app(self):
         return self._server_app
 
+    @property
+    def logger(self):
+        return self._server_app.logger
+
     on_message = _deco_maker('message')
     on_notice = _deco_maker('notice')
-    on_event = _deco_maker('event')  # compatible with v3.x
     on_request = _deco_maker('request')
     on_meta_event = _deco_maker('meta_event')
 
@@ -81,41 +84,39 @@ class CQHttp:
             if request.headers['X-Signature'] != 'sha1=' + sig:
                 abort(403)
 
-        payload = request.json
-        post_type = payload.get('post_type')
-
-        type_key = payload.get(
-            {'message': 'message_type',
-             'notice': 'notice_type',
-             'event': 'event',  # compatible with v3.x
-             'request': 'request_type',
-             'meta_event': 'meta_event_type'}.get(post_type)
-        )
-        if not type_key:
+        event = request.json
+        type_ = event.get('post_type', '')
+        detail_type = event.get('{}_type'.format(type_), '')
+        if not detail_type:
             abort(400)
 
-        handler = self._handlers[post_type].get(
-            type_key, self._handlers[post_type].get('*'))
+        self.logger.info('received event: ' + type_ + '.' + detail_type)
+
+        handler = self._handlers[type_].get(detail_type,
+                                            self._handlers[type_].get('*'))
         if handler:
-            response = handler(payload)
+            response = handler(event)
             return jsonify(response) if isinstance(response, dict) else ''
         return ''
 
     def run(self, host=None, port=None, **kwargs):
         self._server_app.run(host=host, port=port, **kwargs)
 
-    def send(self, context, message, **kwargs):
-        context = context.copy()
-        context['message'] = message
-        context.update(kwargs)
-        if 'message_type' not in context:
-            if 'group_id' in context:
-                context['message_type'] = 'group'
-            elif 'discuss_id' in context:
-                context['message_type'] = 'discuss'
-            elif 'user_id' in context:
-                context['message_type'] = 'private'
-        return self.send_msg(**context)
+    def send(self, event, message, **kwargs):
+        params = event.copy()
+        params['message'] = message
+        params.pop('raw_message', None)  # avoid wasting bandwidth
+        params.pop('comment', None)
+        params.pop('sender', None)
+        params.update(kwargs)
+        if 'message_type' not in params:
+            if 'group_id' in params:
+                params['message_type'] = 'group'
+            elif 'discuss_id' in params:
+                params['message_type'] = 'discuss'
+            elif 'user_id' in params:
+                params['message_type'] = 'private'
+        return self.send_msg(**params)
 
     def __getattr__(self, item):
         if self._api_root:
