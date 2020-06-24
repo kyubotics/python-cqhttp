@@ -1,3 +1,5 @@
+# 本项目已停止维护，请使用功能更丰富的 [python-aiocqhttp](https://github.com/nonebot/python-aiocqhttp) 替代
+
 # CQHTTP Python SDK
 
 [![License](https://img.shields.io/github/license/richardchien/python-cqhttp.svg)](LICENSE)
